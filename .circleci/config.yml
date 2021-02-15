@@ -95,7 +95,7 @@ workflows:
       - api_build
       - api_test:
           requires:
-            - build
+            - api_build
           filters:
             branches:
               ignore: main
