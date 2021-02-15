@@ -12,14 +12,10 @@ jobs:
       - restore_cache:
           key: api-dependency-cache-{{ checksum "api/package-lock.json" }}
       - run:
-          name: Install dependencies
-          command: |
-            cd api
-            npm install
-      - run:
           name: Build
           command: |
             cd api
+            npm install
             npm run build
       - save_cache:
           key: api-dependency-cache-{{ checksum "api/package-lock.json" }}
