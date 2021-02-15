@@ -1,4 +1,4 @@
-import Redis, { RedisOptions, Pipeline } from 'ioredis';
+import Redis, { RedisOptions } from 'ioredis';
 
 declare module 'ioredis' {
   interface Pipeline {
