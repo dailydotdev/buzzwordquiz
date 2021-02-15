@@ -28,7 +28,7 @@ jobs:
             - build
   api_test:
     docker:
-      - image: node:14.15.5
+      - image: circleci/node:14.15.0
       - image: redis:5.0.10
     steps:
       - checkout
@@ -54,7 +54,7 @@ jobs:
           path: ./api/test-results
   pulumi_preview:
     docker:
-      - image: node:14.15.5
+      - image: circleci/node:14.15.0
     steps:
       - checkout
       - pulumi/login
@@ -68,7 +68,7 @@ jobs:
           working_directory: api/infra
   pulumi_up:
     docker:
-      - image: node:14.15.5
+      - image: circleci/node:14.15.0
     steps:
       - checkout
       - gcp-cli/install
