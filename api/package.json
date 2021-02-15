@@ -6,10 +6,10 @@
     "dev": "nodemon ./index.ts | pino-pretty",
     "lint": "eslint . --ext .js,.ts --max-warnings 0",
     "build": "tsc",
-    "prebuild": "rm -rf build",
+    "prebuild": "rm -rf build && npm run compile-schemas",
     "postbuild": "cp -R package.json package-lock.json ./build",
     "test": "jest --testEnvironment=node --runInBand",
-    "pretest": "npm run lint",
+    "pretest": "npm run compile-schemas && npm run lint",
     "compile-schemas": "json2ts -i schemas -o types"
   },
   "dependencies": {
