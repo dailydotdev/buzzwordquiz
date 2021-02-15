@@ -10,7 +10,8 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: api-dependency-cache-{{ checksum "api/package-lock.json" }}
+          key: api-dependency-cache-{{ checksum "package-lock.json" }}
+          working_directory: api
       - run:
           name: Build
           command: |
@@ -18,9 +19,10 @@ jobs:
             npm run build
           working_directory: api
       - save_cache:
-          key: api-dependency-cache-{{ checksum "api/package-lock.json" }}
+          key: api-dependency-cache-{{ checksum "package-lock.json" }}
           paths:
-            - ./api/node_modules
+            - ./node_modules
+          working_directory: api
       - persist_to_workspace:
           root: ./api
           paths:
