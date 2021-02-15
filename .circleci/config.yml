@@ -51,6 +51,11 @@ jobs:
           working_directory: api
           environment:
             - JEST_JUNIT_OUTPUT_DIR: ./test-results
+            - CONTENTFUL_SPACE_ID: space
+            - CONTENTFUL_API_KEY: key
+            - JWT_KEY: topsecret
+            - REDIS_HOST: 127.0.0.1
+            - REDIS_PORT: 6379
       - store_test_results:
           path: ./api/test-results
   pulumi_preview:
