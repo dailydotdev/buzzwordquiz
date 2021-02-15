@@ -45,11 +45,13 @@ jobs:
             echo Failed waiting for Redis && exit 1
       - run:
           name: Test
-          command: npm run test -- --ci --reporters=default --reporters=jest-junit
+          command:  |
+            cd api
+            npm run test -- --ci --reporters=default --reporters=jest-junit
           environment:
             - JEST_JUNIT_OUTPUT_DIR: ./test-results
       - store_test_results:
-          path: ./test-results
+          path: ./api/test-results
   pulumi_preview:
     docker:
       - image: circleci/node:14.15.0
