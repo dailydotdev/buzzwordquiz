@@ -1,0 +1,116 @@
+version: 2.1
+orbs:
+  gcp-gcr: circleci/gcp-gcr@0.6.0
+  gcp-cli: circleci/gcp-cli@2.1.0
+  pulumi: pulumi/pulumi@2.0.0
+jobs:
+  api_build:
+    working_directory: ./api
+    docker:
+      - image: circleci/node:14.15.0
+    steps:
+      - checkout
+      - restore_cache:
+          key: api-dependency-cache-{{ checksum "package-lock.json" }}
+      - run:
+          name: Install dependencies
+          command: npm install
+      - run:
+          name: Build
+          command: npm run build
+      - save_cache:
+          key: api-dependency-cache-{{ checksum "package-lock.json" }}
+          paths:
+            - ./node_modules
+      - persist_to_workspace:
+          root: .
+          paths:
+            - build
+  api_test:
+    working_directory: ./api
+    docker:
+      - image: circleci/node:14.15.0
+      - image: redis:5.0.10
+    steps:
+      - checkout
+      - restore_cache:
+          key: api-dependency-cache-{{ checksum "package-lock.json" }}
+      - run:
+          name: Wait for Redis
+          command: |
+            for i in `seq 1 10`;
+            do
+            nc -z localhost 6379 && echo Success && exit 0
+            echo -n .
+            sleep 1
+            done
+            echo Failed waiting for Redis && exit 1
+      - run:
+          name: Test
+          command: npm run test -- --ci --reporters=default --reporters=jest-junit
+          environment:
+            - JEST_JUNIT_OUTPUT_DIR: ./test-results
+      - store_test_results:
+          path: ./test-results
+  pulumi_preview:
+    docker:
+      - image: circleci/node:14.15.0
+    steps:
+      - checkout
+      - pulumi/login
+      - run:
+          name: Install dependencies
+          command: npm i
+          working_directory: infra
+      - run:
+          name: Pulumi preview
+          command: pulumi preview --suppress-outputs --stack prod -c tag=$CIRCLE_SHA1
+          working_directory: infra
+  pulumi_up:
+    docker:
+      - image: circleci/node:14.15.0
+    steps:
+      - checkout
+      - gcp-cli/install
+      - gcp-cli/initialize
+      - run:
+          name: Get cluster credentials
+          command: gcloud container clusters get-credentials prod
+      - pulumi/login
+      - run:
+          name: Install dependencies
+          command: npm i
+          working_directory: infra
+      - run:
+          name: Pulumi refresh
+          command: pulumi refresh -y --suppress-outputs --stack prod
+          working_directory: infra
+      - run:
+          name: Pulumi up
+          command: pulumi up -y --suppress-outputs --stack prod -c tag=$CIRCLE_SHA1
+          working_directory: infra
+workflows:
+  build:
+    jobs:
+      - api_build
+      - api_test:
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: main
+#      - pulumi_preview:
+#          context: PROD
+#          filters:
+#            branches:
+#              ignore:
+#                - /pull\/[0-9]+/
+#                - main
+#      - pulumi_up:
+#          requires:
+#            - api_build
+#          context: PROD
+#          filters:
+#            branches:
+#              only:
+#                - main
