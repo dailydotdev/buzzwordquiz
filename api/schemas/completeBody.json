@@ -1,0 +1,10 @@
+{
+  "title": "Complete body schema",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

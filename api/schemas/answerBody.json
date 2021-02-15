@@ -1,0 +1,11 @@
+{
+  "title": "Answer body schema",
+  "type": "object",
+  "properties": {
+    "answer": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "required": ["answer"]
+}
