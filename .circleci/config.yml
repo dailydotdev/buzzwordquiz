@@ -5,7 +5,6 @@ orbs:
   pulumi: pulumi/pulumi@2.0.0
 jobs:
   api_build:
-    working_directory: ./api
     docker:
       - image: circleci/node:14.15.0
     steps:
@@ -14,20 +13,23 @@ jobs:
           key: api-dependency-cache-{{ checksum "package-lock.json" }}
       - run:
           name: Install dependencies
-          command: npm install
+          command: |
+            cd api
+            npm install
       - run:
           name: Build
-          command: npm run build
+          command: |
+            cd api
+            npm run build
       - save_cache:
           key: api-dependency-cache-{{ checksum "package-lock.json" }}
           paths:
-            - ./node_modules
+            - ./api/node_modules
       - persist_to_workspace:
-          root: .
+          root: ./api
           paths:
             - build
   api_test:
-    working_directory: ./api
     docker:
       - image: circleci/node:14.15.0
       - image: redis:5.0.10
