@@ -14,9 +14,9 @@ jobs:
       - run:
           name: Build
           command: |
-            cd api
             npm install
             npm run build
+          working_directory: api
       - save_cache:
           key: api-dependency-cache-{{ checksum "api/package-lock.json" }}
           paths:
@@ -32,7 +32,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: api-dependency-cache-{{ checksum "package-lock.json" }}
+          key: api-dependency-cache-{{ checksum "api/package-lock.json" }}
       - run:
           name: Wait for Redis
           command: |
@@ -45,9 +45,8 @@ jobs:
             echo Failed waiting for Redis && exit 1
       - run:
           name: Test
-          command:  |
-            cd api
-            npm run test -- --ci --reporters=default --reporters=jest-junit
+          command: npm run test -- --ci --reporters=default --reporters=jest-junit
+          working_directory: api
           environment:
             - JEST_JUNIT_OUTPUT_DIR: ./test-results
       - store_test_results:
@@ -61,11 +60,11 @@ jobs:
       - run:
           name: Install dependencies
           command: npm i
-          working_directory: infra
+          working_directory: api/infra
       - run:
           name: Pulumi preview
           command: pulumi preview --suppress-outputs --stack prod -c tag=$CIRCLE_SHA1
-          working_directory: infra
+          working_directory: api/infra
   pulumi_up:
     docker:
       - image: circleci/node:14.15.0
@@ -80,15 +79,15 @@ jobs:
       - run:
           name: Install dependencies
           command: npm i
-          working_directory: infra
+          working_directory: api/infra
       - run:
           name: Pulumi refresh
           command: pulumi refresh -y --suppress-outputs --stack prod
-          working_directory: infra
+          working_directory: api/infra
       - run:
           name: Pulumi up
           command: pulumi up -y --suppress-outputs --stack prod -c tag=$CIRCLE_SHA1
-          working_directory: infra
+          working_directory: api/infra
 workflows:
   build:
     jobs:
