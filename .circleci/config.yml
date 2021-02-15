@@ -100,7 +100,7 @@ workflows:
             branches:
               ignore: main
 #      - pulumi_preview:
-#          context: PROD
+#          context: BUZZQUIZ
 #          filters:
 #            branches:
 #              ignore:
@@ -109,7 +109,7 @@ workflows:
 #      - pulumi_up:
 #          requires:
 #            - api_build
-#          context: PROD
+#          context: BUZZQUIZ
 #          filters:
 #            branches:
 #              only:
