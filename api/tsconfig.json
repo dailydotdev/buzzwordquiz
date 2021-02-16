@@ -11,6 +11,7 @@
     "resolveJsonModule": true
   },
   "exclude": [
-    "infra"
+    "infra",
+    "__tests__"
   ]
 }
