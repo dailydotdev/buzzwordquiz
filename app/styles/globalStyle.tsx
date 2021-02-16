@@ -103,4 +103,10 @@ export default css`
     flex-direction: column;
     align-items: stretch;
   }
+
+  html,
+  body,
+  #__next {
+    height: 100%;
+  }
 `;
