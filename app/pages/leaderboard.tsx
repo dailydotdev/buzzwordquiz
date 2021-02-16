@@ -16,11 +16,16 @@ const Title = styled.h1`
   ${typoTitle1}
 `;
 
-const Board = styled.div`
+const List = styled.ol`
+  margin: 0;
+  padding: 0;
+`;
+
+const ListItem = styled.li`
   display: grid;
   grid-template-columns: ${rem(40)} 1fr ${rem(40)};
   grid-column-gap: ${rem(8)};
-  grid-row-gap: ${rem(8)};
+  margin: ${rem(4)} 0;
   font-weight: bold;
   ${typoHeadline}
 `;
@@ -50,9 +55,9 @@ export default function Index(): ReactElement {
   return (
     <Main>
       <Title>Hall of Fame 🏆</Title>
-      <Board>
+      <List>
         {leaderboard.map((record, index) => (
-          <>
+          <ListItem value={record.score} key={index}>
             <div>{rankRepresentation(index + 1)}</div>
             <div>{record.name}</div>
             <div
@@ -62,9 +67,9 @@ export default function Index(): ReactElement {
             >
               {record.score}
             </div>
-          </>
+          </ListItem>
         ))}
-      </Board>
+      </List>
     </Main>
   );
 }
