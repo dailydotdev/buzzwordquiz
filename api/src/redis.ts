@@ -1,6 +1,6 @@
 import Redis, { RedisOptions } from 'ioredis';
 
-declare module 'IORedis' {
+declare module 'ioredis' {
   interface Pipeline {
     sortedTrim: (key: string, value: string | number) => Pipeline;
     leaderboard: (key: string, value: string | number) => Pipeline;

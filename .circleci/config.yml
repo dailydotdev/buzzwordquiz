@@ -1,0 +1,122 @@
+version: 2.1
+orbs:
+  gcp-gcr: circleci/gcp-gcr@0.6.0
+  gcp-cli: circleci/gcp-cli@2.1.0
+  pulumi: pulumi/pulumi@2.0.0
+jobs:
+  api_build:
+    docker:
+      - image: node:14.15.5
+    steps:
+      - checkout
+      - restore_cache:
+          key: api-dependency-cache-{{ checksum "api/package-lock.json" }}
+      - run:
+          name: Build
+          command: |
+            npm i -g npm
+            npm install
+            npm run build
+          working_directory: api
+      - save_cache:
+          key: api-dependency-cache-{{ checksum "api/package-lock.json" }}
+          paths:
+            - ./api/node_modules
+      - persist_to_workspace:
+          root: ./api
+          paths:
+            - build
+  api_test:
+    docker:
+      - image: node:14.15.5
+      - image: redis:5.0.10
+    steps:
+      - checkout
+      - restore_cache:
+          key: api-dependency-cache-{{ checksum "api/package-lock.json" }}
+      - run:
+          name: Wait for Redis
+          command: |
+            apt-get update && apt-get install -y netcat
+            for i in `seq 1 10`;
+            do
+            nc -z localhost 6379 && echo Success && exit 0
+            echo -n .
+            sleep 1
+            done
+            echo Failed waiting for Redis && exit 1
+      - run:
+          name: Test
+          command: npm run test -- --ci --reporters=default --reporters=jest-junit
+          working_directory: api
+          environment:
+            - JEST_JUNIT_OUTPUT_DIR: ./test-results
+            - CONTENTFUL_SPACE_ID: space
+            - CONTENTFUL_API_KEY: key
+            - JWT_KEY: topsecret
+            - REDIS_HOST: 127.0.0.1
+            - REDIS_PORT: 6379
+      - store_test_results:
+          path: ./api/test-results
+  pulumi_preview:
+    docker:
+      - image: node:14.15.5
+    steps:
+      - checkout
+      - pulumi/login
+      - run:
+          name: Install dependencies
+          command: npm i
+          working_directory: api/infra
+      - run:
+          name: Pulumi preview
+          command: pulumi preview --suppress-outputs --stack prod -c tag=$CIRCLE_SHA1
+          working_directory: api/infra
+  pulumi_up:
+    docker:
+      - image: node:14.15.5
+    steps:
+      - checkout
+      - gcp-cli/install
+      - gcp-cli/initialize
+      - run:
+          name: Get cluster credentials
+          command: gcloud container clusters get-credentials prod
+      - pulumi/login
+      - run:
+          name: Install dependencies
+          command: npm i
+          working_directory: api/infra
+      - run:
+          name: Pulumi refresh
+          command: pulumi refresh -y --suppress-outputs --stack prod
+          working_directory: api/infra
+      - run:
+          name: Pulumi up
+          command: pulumi up -y --suppress-outputs --stack prod -c tag=$CIRCLE_SHA1
+          working_directory: api/infra
+workflows:
+  build:
+    jobs:
+      - api_build
+      - api_test:
+          requires:
+            - api_build
+          filters:
+            branches:
+              ignore: main
+#      - pulumi_preview:
+#          context: BUZZQUIZ
+#          filters:
+#            branches:
+#              ignore:
+#                - /pull\/[0-9]+/
+#                - main
+#      - pulumi_up:
+#          requires:
+#            - api_build
+#          context: BUZZQUIZ
+#          filters:
+#            branches:
+#              only:
+#                - main
