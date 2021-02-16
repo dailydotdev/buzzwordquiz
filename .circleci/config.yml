@@ -6,7 +6,7 @@ orbs:
 jobs:
   api_build:
     docker:
-      - image: node:14.15.5
+      - image: circleci/node:14.15.0
     steps:
       - checkout
       - restore_cache:
@@ -14,7 +14,6 @@ jobs:
       - run:
           name: Build
           command: |
-            npm i -g npm
             npm install
             npm run build
           working_directory: api
@@ -28,7 +27,7 @@ jobs:
             - api/build
   api_test:
     docker:
-      - image: node:14.15.5
+      - image: circleci/node:14.15.0
       - image: redis:5.0.10
     steps:
       - checkout
@@ -37,7 +36,6 @@ jobs:
       - run:
           name: Wait for Redis
           command: |
-            apt-get update && apt-get install -y netcat
             for i in `seq 1 10`;
             do
             nc -z localhost 6379 && echo Success && exit 0
@@ -60,7 +58,7 @@ jobs:
           path: ./api/test-results
   api_deploy:
     docker:
-      - image: node:14.15.5
+      - image: circleci/node:14.15.0
     steps:
       - checkout
       - attach_workspace:
