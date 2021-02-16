@@ -1,6 +1,7 @@
 .env
 types
 build/
+app.yaml
 
 ### Node template
 # Logs

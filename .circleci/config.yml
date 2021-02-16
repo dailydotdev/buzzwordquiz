@@ -89,7 +89,7 @@ workflows:
           requires:
             - api_build
           context: BUZZQUIZ
-#          filters:
-#            branches:
-#              only:
-#                - main
+          filters:
+            branches:
+              only:
+                - main
