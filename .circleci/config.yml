@@ -23,9 +23,9 @@ jobs:
           paths:
             - ./api/node_modules
       - persist_to_workspace:
-          root: ./api
+          root: .
           paths:
-            - build
+            - api/build
   api_test:
     docker:
       - image: node:14.15.5
@@ -58,43 +58,23 @@ jobs:
             - REDIS_PORT: 6379
       - store_test_results:
           path: ./api/test-results
-  pulumi_preview:
+  api_deploy:
     docker:
       - image: node:14.15.5
     steps:
       - checkout
-      - pulumi/login
-      - run:
-          name: Install dependencies
-          command: npm i
-          working_directory: api/infra
-      - run:
-          name: Pulumi preview
-          command: pulumi preview --suppress-outputs --stack prod -c tag=$CIRCLE_SHA1
-          working_directory: api/infra
-  pulumi_up:
-    docker:
-      - image: node:14.15.5
-    steps:
-      - checkout
+      - attach_workspace:
+          at: .
       - gcp-cli/install
       - gcp-cli/initialize
       - run:
-          name: Get cluster credentials
-          command: gcloud container clusters get-credentials prod
-      - pulumi/login
+          name: Create app.yaml
+          command: echo $API_APP_YAML | base64 -d > app.yaml
+          working_directory: api/build
       - run:
-          name: Install dependencies
-          command: npm i
-          working_directory: api/infra
-      - run:
-          name: Pulumi refresh
-          command: pulumi refresh -y --suppress-outputs --stack prod
-          working_directory: api/infra
-      - run:
-          name: Pulumi up
-          command: pulumi up -y --suppress-outputs --stack prod -c tag=$CIRCLE_SHA1
-          working_directory: api/infra
+          name: Deploy
+          command: gcloud app deploy
+          working_directory: api/build
 workflows:
   build:
     jobs:
@@ -105,17 +85,10 @@ workflows:
           filters:
             branches:
               ignore: main
-#      - pulumi_preview:
-#          context: BUZZQUIZ
-#          filters:
-#            branches:
-#              ignore:
-#                - /pull\/[0-9]+/
-#                - main
-#      - pulumi_up:
-#          requires:
-#            - api_build
-#          context: BUZZQUIZ
+      - api_deploy:
+          requires:
+            - api_build
+          context: BUZZQUIZ
 #          filters:
 #            branches:
 #              only:
