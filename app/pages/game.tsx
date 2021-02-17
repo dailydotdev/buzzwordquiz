@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/react';
-import { ReactElement } from 'react';
+import { ReactElement, useState } from 'react';
 import styled from '@emotion/styled';
 import rem from '../macros/rem.macro';
 import PrimaryButton from '../components/buttons/PrimaryButton';
@@ -120,20 +120,68 @@ const words = [5];
 const options = ['R', 'E', 'D', 'I', 'S', 'A', 'B', 'C', 'D', 'E'];
 const progress = 80;
 const score = 2;
-const completed = true;
+const completed = false;
+
+function updateArrayItem<T>(array: T[], index: number, item: T): T[] {
+  return [...array.slice(0, index), item, ...array.slice(index + 1)];
+}
 
 export default function Game(): ReactElement {
-  const answerLetters = words.flatMap((word, index) => {
-    const base: string[] = new Array(word).fill(null);
-    if (index < words.length - 1) {
-      return [...base, 'space'];
-    }
-    return base;
-  });
-  answerLetters[0] = 'R';
-  answerLetters[1] = 'E';
+  const [optionsState, setOptionsState] = useState(
+    options.map((option) => ({ selected: false, letter: option })),
+  );
+  const [answerLetters, setAnswerLetters] = useState(
+    words.flatMap((word, index) => {
+      const base: string[] = new Array(word).fill(null);
+      if (index < words.length - 1) {
+        return [...base, 'space'];
+      }
+      return base;
+    }),
+  );
 
   const progressColor: ColorName = 'avocado';
+
+  const submitAnswer = (): void => {
+    console.log('submit!');
+  };
+
+  const onOptionClick = (index: number): void => {
+    const availableSpot = answerLetters.findIndex((letter) => !letter);
+    if (availableSpot > -1) {
+      setAnswerLetters(
+        updateArrayItem(
+          answerLetters,
+          availableSpot,
+          optionsState[index].letter,
+        ),
+      );
+      setOptionsState(
+        updateArrayItem(optionsState, index, {
+          ...optionsState[index],
+          selected: true,
+        }),
+      );
+      if (availableSpot === answerLetters.length - 1) {
+        submitAnswer();
+      }
+    }
+  };
+
+  const onAnswerClick = (index: number): void => {
+    const optionIndex = optionsState.findIndex(
+      (option) => option.selected && option.letter === answerLetters[index],
+    );
+    if (optionIndex > -1) {
+      setAnswerLetters(updateArrayItem(answerLetters, index, null));
+      setOptionsState(
+        updateArrayItem(optionsState, optionIndex, {
+          ...optionsState[optionIndex],
+          selected: false,
+        }),
+      );
+    }
+  };
 
   return (
     <Main>
@@ -197,16 +245,24 @@ export default function Game(): ReactElement {
               ) : letter === 'space' ? (
                 <WrapBreak key={index} />
               ) : (
-                <SecondaryButton buttonSize="small" key={index}>
+                <SecondaryButton
+                  buttonSize="small"
+                  key={index}
+                  onClick={() => onAnswerClick(index)}
+                >
                   {letter}
                 </SecondaryButton>
               ),
             )}
           </Letters>
           <Options>
-            {options.map((letter, index) => (
-              <PrimaryButton key={index} disabled={index < 2}>
-                {letter}
+            {optionsState.map((option, index) => (
+              <PrimaryButton
+                key={index}
+                disabled={option.selected}
+                onClick={() => onOptionClick(index)}
+              >
+                {option.letter}
               </PrimaryButton>
             ))}
           </Options>
