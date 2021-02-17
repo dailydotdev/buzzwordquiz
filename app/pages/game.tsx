@@ -4,7 +4,7 @@ import { ReactElement } from 'react';
 import styled from '@emotion/styled';
 import rem from '../macros/rem.macro';
 import PrimaryButton from '../components/buttons/PrimaryButton';
-import { typoCallout, typoFootnote } from '../styles/typography';
+import { typoCallout, typoFootnote, typoTitle3 } from '../styles/typography';
 import SecondaryButton from '../components/buttons/SecondaryButton';
 import RadialProgress from '../components/RadialProgress';
 import colors, { ColorName } from '../styles/colors';
@@ -13,6 +13,17 @@ import PageContainer from '../components/PageContainer';
 
 const Main = styled(PageContainer)`
   padding: ${rem(40)} ${rem(20)};
+`;
+
+const Header = styled.header`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: ${rem(32)};
+`;
+
+const Score = styled.h2`
+  ${typoTitle3}
 `;
 
 const ImageContainer = styled.div`
@@ -77,7 +88,6 @@ const WrapBreak = styled.span`
 `;
 
 const Options = styled(Letters)`
-  max-width: ${rem(256)};
   margin-top: auto;
 
   > * {
@@ -89,6 +99,7 @@ const Options = styled(Letters)`
 const words = [5];
 const options = ['R', 'E', 'D', 'I', 'S', 'A', 'B', 'C', 'D', 'E'];
 const progress = 80;
+const score = 2;
 
 export default function Game(): ReactElement {
   const answerLetters = words.flatMap((word, index) => {
@@ -105,35 +116,35 @@ export default function Game(): ReactElement {
 
   return (
     <Main>
-      <RadialProgress
-        steps={90}
-        progress={progress}
-        css={css`
-          position: relative;
-          align-self: flex-end;
-          margin-right: ${rem(16)};
-          margin-bottom: ${rem(32)};
-          --radial-progress-step: var(--theme-background-secondary);
-          --radial-progress-completed-step: ${colors[progressColor]['50']};
-        `}
-      >
-        <span
+      <Header>
+        <Score>Score: {score}</Score>
+        <RadialProgress
+          steps={90}
+          progress={progress}
           css={css`
-            display: flex;
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            ${typoCallout}
+            position: relative;
+            --radial-progress-step: var(--theme-background-secondary);
+            --radial-progress-completed-step: ${colors[progressColor]['50']};
           `}
         >
-          {progress}
-        </span>
-      </RadialProgress>
+          <span
+            css={css`
+              display: flex;
+              position: absolute;
+              left: 0;
+              right: 0;
+              top: 0;
+              bottom: 0;
+              align-items: center;
+              justify-content: center;
+              font-weight: bold;
+              ${typoCallout}
+            `}
+          >
+            {progress}
+          </span>
+        </RadialProgress>
+      </Header>
       <ImageContainer>
         <img src="https://daily-now-res.cloudinary.com/image/upload/v1611565802/logos/dd2e9bdf8f9e4d0f8e0a48063f3f36c9.jpg" />
       </ImageContainer>
