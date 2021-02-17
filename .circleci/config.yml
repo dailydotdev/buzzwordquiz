@@ -73,6 +73,29 @@ jobs:
           name: Deploy
           command: gcloud app deploy
           working_directory: api/build
+  app_build:
+    docker:
+      - image: circleci/node:14.15.0
+    steps:
+      - checkout
+      - restore_cache:
+          key: app-dependency-cache-{{ checksum "app/package-lock.json" }}
+      - run:
+          name: Install dependencies
+          command: npm install
+          working_directory: app
+      - save_cache:
+          key: app-dependency-cache-{{ checksum "app/package-lock.json" }}
+          paths:
+            - ./app/node_modules
+      - run:
+          name: Test
+          command: npm run test -- --ci --reporters=default --reporters=jest-junit --runInBand
+          working_directory: app
+          environment:
+            - JEST_JUNIT_OUTPUT_DIR: ./test-results
+      - store_test_results:
+          path: ./app/test-results
 workflows:
   build:
     jobs:
@@ -91,3 +114,4 @@ workflows:
             branches:
               only:
                 - main
+      - app_build
