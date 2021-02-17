@@ -104,8 +104,16 @@ export default css`
     align-items: stretch;
   }
 
-  html,
-  body,
+  body {
+    height: 100vh;
+    /* mobile viewport bug fix */
+    height: -webkit-fill-available;
+  }
+
+  html {
+    height: -webkit-fill-available;
+  }
+
   #__next {
     height: 100%;
   }
