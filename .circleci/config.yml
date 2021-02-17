@@ -83,6 +83,7 @@ jobs:
       - run:
           name: Install dependencies
           command: npm install
+          working_directory: app
       - save_cache:
           key: app-dependency-cache-{{ checksum "app/package-lock.json" }}
           paths:
