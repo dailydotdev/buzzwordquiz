@@ -17,6 +17,7 @@ import Link from 'next/link';
 import SecondaryButton from '../components/buttons/SecondaryButton';
 
 const Main = styled(PageContainer)`
+  padding: ${rem(20)};
   max-height: unset;
 `;
 
