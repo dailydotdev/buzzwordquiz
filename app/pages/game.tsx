@@ -4,12 +4,19 @@ import { ReactElement } from 'react';
 import styled from '@emotion/styled';
 import rem from '../macros/rem.macro';
 import PrimaryButton from '../components/buttons/PrimaryButton';
-import { typoCallout, typoFootnote, typoTitle3 } from '../styles/typography';
+import {
+  typoCallout,
+  typoFootnote,
+  typoGiga1,
+  typoMega2,
+  typoTitle3,
+} from '../styles/typography';
 import SecondaryButton from '../components/buttons/SecondaryButton';
 import RadialProgress from '../components/RadialProgress';
 import colors, { ColorName } from '../styles/colors';
 import TertiaryButton from '../components/buttons/TertiaryButton';
 import PageContainer from '../components/PageContainer';
+import TextField from '../components/fields/TextField';
 
 const Main = styled(PageContainer)`
   padding: ${rem(40)} ${rem(20)};
@@ -23,6 +30,7 @@ const Header = styled.header`
 `;
 
 const Score = styled.h2`
+  margin: 0;
   ${typoTitle3}
 `;
 
@@ -96,10 +104,28 @@ const Options = styled(Letters)`
   }
 `;
 
+const CompletedConfetti = styled.div`
+  text-align: center;
+  ${typoGiga1}
+`;
+
+const CompletedScore = styled.h2`
+  margin: ${rem(16)} 0 ${rem(48)};
+  text-align: center;
+  ${typoMega2}
+`;
+
+const CompletedText = styled.div`
+  margin: ${rem(32)} ${rem(12)} ${rem(8)};
+  color: var(--theme-label-quaternary);
+  ${typoFootnote}
+`;
+
 const words = [5];
 const options = ['R', 'E', 'D', 'I', 'S', 'A', 'B', 'C', 'D', 'E'];
 const progress = 80;
 const score = 2;
+const completed = true;
 
 export default function Game(): ReactElement {
   const answerLetters = words.flatMap((word, index) => {
@@ -116,65 +142,88 @@ export default function Game(): ReactElement {
 
   return (
     <Main>
-      <Header>
-        <Score>Score: {score}</Score>
-        <RadialProgress
-          steps={90}
-          progress={progress}
-          css={css`
-            position: relative;
-            --radial-progress-step: var(--theme-background-secondary);
-            --radial-progress-completed-step: ${colors[progressColor]['50']};
-          `}
-        >
-          <span
+      {completed ? (
+        <>
+          <CompletedConfetti>🎉</CompletedConfetti>
+          <CompletedScore>Score: {score}</CompletedScore>
+          <CompletedText>
+            Fill in your nickname to enter our hall of fame
+          </CompletedText>
+          <TextField inputId="nickname" label="Nickname" />
+          <PrimaryButton
             css={css`
-              display: flex;
-              position: absolute;
-              left: 0;
-              right: 0;
-              top: 0;
-              bottom: 0;
-              align-items: center;
-              justify-content: center;
-              font-weight: bold;
-              ${typoCallout}
+              margin-top: ${rem(32)};
+              align-self: center;
             `}
           >
-            {progress}
-          </span>
-        </RadialProgress>
-      </Header>
-      <ImageContainer>
-        <img src="https://daily-now-res.cloudinary.com/image/upload/v1611565802/logos/dd2e9bdf8f9e4d0f8e0a48063f3f36c9.jpg" />
-      </ImageContainer>
-      <Letters>
-        {answerLetters.map((letter, index) =>
-          !letter ? (
-            <EmptyLetter key={index} />
-          ) : letter === 'space' ? (
-            <WrapBreak key={index} />
-          ) : (
-            <SecondaryButton buttonSize="small" key={index}>
-              {letter}
-            </SecondaryButton>
-          ),
-        )}
-      </Letters>
-      <Options>
-        {options.map((letter, index) => (
-          <PrimaryButton key={index} disabled={index < 2}>
-            {letter}
+            For fame and glory 🎖
           </PrimaryButton>
-        ))}
-      </Options>
-      <TertiaryButton
-        css={css`
-          margin-top: ${rem(40)};
-        `}
-      >
-        Skip (0/5)
-      </TertiaryButton>
+        </>
+      ) : (
+        <>
+          <Header>
+            <Score>Score: {score}</Score>
+            <RadialProgress
+              steps={90}
+              progress={progress}
+              css={css`
+                position: relative;
+                --radial-progress-step: var(--theme-background-secondary);
+                --radial-progress-completed-step: ${colors[progressColor][
+                  '50'
+                ]};
+              `}
+            >
+              <span
+                css={css`
+                  display: flex;
+                  position: absolute;
+                  left: 0;
+                  right: 0;
+                  top: 0;
+                  bottom: 0;
+                  align-items: center;
+                  justify-content: center;
+                  font-weight: bold;
+                  ${typoCallout}
+                `}
+              >
+                {progress}
+              </span>
+            </RadialProgress>
+          </Header>
+          <ImageContainer>
+            <img src="https://daily-now-res.cloudinary.com/image/upload/v1611565802/logos/dd2e9bdf8f9e4d0f8e0a48063f3f36c9.jpg" />
+          </ImageContainer>
+          <Letters>
+            {answerLetters.map((letter, index) =>
+              !letter ? (
+                <EmptyLetter key={index} />
+              ) : letter === 'space' ? (
+                <WrapBreak key={index} />
+              ) : (
+                <SecondaryButton buttonSize="small" key={index}>
+                  {letter}
+                </SecondaryButton>
+              ),
+            )}
+          </Letters>
+          <Options>
+            {options.map((letter, index) => (
+              <PrimaryButton key={index} disabled={index < 2}>
+                {letter}
+              </PrimaryButton>
+            ))}
+          </Options>
+          <TertiaryButton
+            css={css`
+              margin-top: ${rem(40)};
+            `}
+          >
+            Skip (0/5)
+          </TertiaryButton>
+        </>
+      )}
     </Main>
   );
 }
