@@ -1,7 +1,7 @@
 import React, { ReactElement } from 'react';
 import Link from 'next/link';
 import styled from '@emotion/styled';
-import { typoTitle1 } from '../styles/typography';
+import { typoFootnote, typoTitle1 } from '../styles/typography';
 import rem from '../macros/rem.macro';
 import PrimaryButton from '../components/buttons/PrimaryButton';
 import SecondaryButton from '../components/buttons/SecondaryButton';
@@ -19,6 +19,13 @@ const Title = styled.h1`
   ${typoTitle1}
 `;
 
+const Credit = styled.a`
+  align-self: center;
+  color: var(--theme-label-tertiary);
+  text-decoration: underline;
+  ${typoFootnote}
+`;
+
 export default function Index(): ReactElement {
   return (
     <Main>
@@ -33,6 +40,9 @@ export default function Index(): ReactElement {
           Leaderboard please... 🍿
         </SecondaryButton>
       </Link>
+      <Credit href="https://app.daily.dev/?ref=buzzwordquiz">
+        Made with ❤️ by daily.dev
+      </Credit>
     </Main>
   );
 }
