@@ -1,14 +1,15 @@
 import {
+  ADDTIONAL_KEYS_PER_ANSWER,
   generateLettersFromAnswer,
   getWordsLengths,
-  KEYS_PER_ANSWER,
+  MAX_KEYS_PER_ANSWER,
 } from '../../src/models/question';
 
 describe('generateLettersFromAnswer', () => {
   it('should generate random uppercase letters for a given answer', () => {
     const answer = 'redis';
     const letters = generateLettersFromAnswer(answer);
-    expect(letters.length).toEqual(KEYS_PER_ANSWER);
+    expect(letters.length).toEqual(5 + ADDTIONAL_KEYS_PER_ANSWER);
     [...answer.toUpperCase()].map((char) => expect(letters).toContain(char));
     letters.map((letter) => expect(letter).toMatch(/[A-Z]/));
   });
@@ -16,7 +17,7 @@ describe('generateLettersFromAnswer', () => {
   it('should ignore spaces', () => {
     const answer = 'product hunt';
     const letters = generateLettersFromAnswer(answer);
-    expect(letters.length).toEqual(KEYS_PER_ANSWER);
+    expect(letters.length).toEqual(MAX_KEYS_PER_ANSWER);
     [...answer.toUpperCase().replace(/ /g, '')].map((char) =>
       expect(letters).toContain(char),
     );

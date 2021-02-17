@@ -4,7 +4,8 @@ const client = createClient({
   accessToken: process.env.CONTENTFUL_API_KEY,
 });
 
-export const KEYS_PER_ANSWER = 12;
+export const ADDTIONAL_KEYS_PER_ANSWER = 5;
+export const MAX_KEYS_PER_ANSWER = 14;
 const ASCII_RANGE_START = 'a'.charCodeAt(0);
 const ASCII_RANGE_SIZE = 'z'.charCodeAt(0) - ASCII_RANGE_START;
 
@@ -48,7 +49,10 @@ export const getNextQuestion = async (
 
 export const generateLettersFromAnswer = (answer: string): string[] => {
   const answerNoSpaces = answer.replace(/ /g, '');
-  const randomCharsCount = KEYS_PER_ANSWER - answerNoSpaces.length;
+  const randomCharsCount = Math.min(
+    MAX_KEYS_PER_ANSWER - answerNoSpaces.length,
+    ADDTIONAL_KEYS_PER_ANSWER,
+  );
   const randomChars = [...new Array(randomCharsCount)].map(() =>
     String.fromCharCode(random(ASCII_RANGE_SIZE) + ASCII_RANGE_START),
   );

@@ -79,6 +79,11 @@ const WrapBreak = styled.span`
 const Options = styled(Letters)`
   max-width: ${rem(256)};
   margin-top: auto;
+
+  > * {
+    width: ${rem(40)};
+    height: ${rem(40)};
+  }
 `;
 
 const words = [5];
@@ -147,7 +152,7 @@ export default function Game(): ReactElement {
       </Letters>
       <Options>
         {options.map((letter, index) => (
-          <PrimaryButton buttonSize="small" key={index} disabled={index < 2}>
+          <PrimaryButton key={index} disabled={index < 2}>
             {letter}
           </PrimaryButton>
         ))}

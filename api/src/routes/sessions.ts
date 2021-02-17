@@ -21,7 +21,7 @@ import { preValidationHookHandler } from 'fastify/types/hooks';
 const jwtSign = promisify(jwt.sign);
 
 const JWT_TTL = 10 * 60;
-export const MAX_SKIPS = 5;
+export const MAX_SKIPS = 3;
 export const SESSION_DURATION = 90;
 export const LEADERBOARD_SIZE = 100;
 
