@@ -7,7 +7,6 @@ import PrimaryButton from '../components/buttons/PrimaryButton';
 import {
   typoCallout,
   typoFootnote,
-  typoGiga1,
   typoMega3,
   typoTitle3,
 } from '../styles/typography';
@@ -17,6 +16,7 @@ import colors, { ColorName } from '../styles/colors';
 import TertiaryButton from '../components/buttons/TertiaryButton';
 import PageContainer from '../components/PageContainer';
 import TextField from '../components/fields/TextField';
+import BigEmoji from '../components/BigEmoji';
 
 const Main = styled(PageContainer)`
   padding: ${rem(40)} ${rem(20)};
@@ -104,11 +104,6 @@ const Options = styled(Letters)`
   }
 `;
 
-const CompletedConfetti = styled.div`
-  text-align: center;
-  ${typoGiga1}
-`;
-
 const CompletedScore = styled.h2`
   margin: ${rem(16)} 0 ${rem(48)};
   text-align: center;
@@ -144,7 +139,7 @@ export default function Game(): ReactElement {
     <Main>
       {completed ? (
         <>
-          <CompletedConfetti>🎉</CompletedConfetti>
+          <BigEmoji>🎉</BigEmoji>
           <CompletedScore>Your score: {score}</CompletedScore>
           <CompletedText>
             Fill in your nickname to enter our hall of fame
