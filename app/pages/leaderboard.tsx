@@ -14,7 +14,7 @@ import DailyDevLogo from '../components/DailyDevLogo';
 import PrimaryButton from '../components/buttons/PrimaryButton';
 import BigEmoji from '../components/BigEmoji';
 import Link from 'next/link';
-import TertiaryButton from '../components/buttons/TertiaryButton';
+import SecondaryButton from '../components/buttons/SecondaryButton';
 
 const Main = styled(PageContainer)`
   max-height: unset;
@@ -120,9 +120,9 @@ export default function Index(): ReactElement {
           />
         </a>
         <Link href="/game" passHref>
-          <TertiaryButton as="a" buttonSize="small">
+          <SecondaryButton as="a" buttonSize="small">
             Play again
-          </TertiaryButton>
+          </SecondaryButton>
         </Link>
       </Header>
       <>
