@@ -8,7 +8,7 @@ import {
   typoCallout,
   typoFootnote,
   typoGiga1,
-  typoMega2,
+  typoMega3,
   typoTitle3,
 } from '../styles/typography';
 import SecondaryButton from '../components/buttons/SecondaryButton';
@@ -112,7 +112,7 @@ const CompletedConfetti = styled.div`
 const CompletedScore = styled.h2`
   margin: ${rem(16)} 0 ${rem(48)};
   text-align: center;
-  ${typoMega2}
+  ${typoMega3}
 `;
 
 const CompletedText = styled.div`
@@ -145,7 +145,7 @@ export default function Game(): ReactElement {
       {completed ? (
         <>
           <CompletedConfetti>🎉</CompletedConfetti>
-          <CompletedScore>Score: {score}</CompletedScore>
+          <CompletedScore>Your score: {score}</CompletedScore>
           <CompletedText>
             Fill in your nickname to enter our hall of fame
           </CompletedText>
