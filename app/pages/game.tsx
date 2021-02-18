@@ -40,8 +40,6 @@ const ImageContainer = styled.div`
   display: flex;
   width: 30vh;
   max-width: ${rem(256)};
-  align-items: center;
-  justify-content: center;
   align-self: center;
   overflow: hidden;
   margin-bottom: ${rem(32)};
