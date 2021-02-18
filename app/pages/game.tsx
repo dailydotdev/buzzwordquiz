@@ -19,6 +19,7 @@ import TextField from '../components/fields/TextField';
 import BigEmoji from '../components/BigEmoji';
 import useGameSession, { UnansweredQuestion } from '../hooks/useGameSession';
 import useTimer from '../hooks/useTimer';
+import useSound from 'use-sound';
 
 const Main = styled(PageContainer)`
   padding: ${rem(40)} ${rem(20)};
@@ -134,12 +135,19 @@ export default function Game(): ReactElement {
   const [answerLetters, setAnswerLetters] = useState<string[]>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const { session, startSession, sendAnswer } = useGameSession();
-  const { millisecondsLeft, quantizedProgress } = useTimer(
+  const [playSuccess] = useSound('/success.mp3');
+  const [playFail] = useSound('/fail.mp3');
+  const [playClock, { stop: stopClock }] = useSound('/clock.mp3', {
+    loop: true,
+  });
+
+  const { session, startSession, sendAnswer, skipQuestion } = useGameSession();
+  const { millisecondsLeft, quantizedProgress, lastTenSeconds } = useTimer(
     session?.duration * 1000,
     isLoading,
     3,
     () => {
+      stopClock();
       console.log('timeout');
     },
   );
@@ -167,12 +175,20 @@ export default function Game(): ReactElement {
     }
   }, [question]);
 
+  useEffect(() => {
+    if (lastTenSeconds) {
+      playClock();
+    }
+  }, [lastTenSeconds]);
+
   const submitAnswer = async (answer: string): Promise<void> => {
     setIsLoading(true);
     const res = await sendAnswer(answer);
     if (res.correct) {
+      playSuccess();
       setQuestion(res.session.nextQuestion);
     } else {
+      playFail();
       setIsLoading(false);
     }
   };
@@ -215,6 +231,12 @@ export default function Game(): ReactElement {
         }),
       );
     }
+  };
+
+  const skip = async () => {
+    setIsLoading(true);
+    const res = await skipQuestion();
+    setQuestion(res.session.nextQuestion);
   };
 
   if (!question || !session) {
@@ -312,6 +334,8 @@ export default function Game(): ReactElement {
             css={css`
               margin-top: ${rem(40)};
             `}
+            onClick={skip}
+            disabled={session.skips >= session.maxSkips}
           >
             Skip ({session.skips}/{session.maxSkips})
           </TertiaryButton>

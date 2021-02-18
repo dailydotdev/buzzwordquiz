@@ -4,6 +4,7 @@ import useInterval from './useInterval';
 type UseTimerReturn = {
   millisecondsLeft: number;
   quantizedProgress: number;
+  lastTenSeconds: boolean;
 };
 
 export default function useTimer(
@@ -33,5 +34,6 @@ export default function useTimer(
       Math.floor((accumulated * quanitzation) / milliseconds),
       quanitzation - 1,
     ),
+    lastTenSeconds: milliseconds - accumulated < 10_000,
   };
 }

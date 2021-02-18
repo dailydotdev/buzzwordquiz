@@ -79,7 +79,7 @@ const validateSession: preValidationHookHandler = async (request, reply) => {
     !request.gameSession ||
     request.gameSession.ended ||
     Date.now() - new Date(request.gameSession.startedAt).getTime() >
-      request.gameSession.duration * 1000
+      (request.gameSession.duration + 1) * 1000
   ) {
     return reply.status(401).send();
   }

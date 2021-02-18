@@ -23,6 +23,7 @@ type UseGameSessionReturn = {
   sendAnswer: (
     answer: string,
   ) => Promise<{ correct: boolean; session?: Session }>;
+  skipQuestion: () => Promise<{ session: Session }>;
 };
 
 export default function useGameSession(): UseGameSessionReturn {
@@ -52,6 +53,19 @@ export default function useGameSession(): UseGameSessionReturn {
         correct: boolean;
         session?: Session;
       };
+      if (body.session) {
+        setSession(body.session);
+      }
+      return body;
+    },
+    skipQuestion: async () => {
+      const res = await fetch('/api/sessions/skip', {
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
+      const body = (await res.json()) as { session: Session };
       if (body.session) {
         setSession(body.session);
       }
