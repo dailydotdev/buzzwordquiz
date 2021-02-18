@@ -1,10 +1,12 @@
+import { Router } from 'next/router';
+
 if (process.env.NODE_ENV === 'development') {
   // Must use require here as import statements are only allowed
   // to exist at top-level.
   require('preact/debug');
 }
 
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 import { AppProps } from 'next/app';
 import Head from 'next/head';
 import 'focus-visible';
@@ -12,8 +14,27 @@ import { DefaultSeo } from 'next-seo';
 import Seo from '../next-seo';
 import globalStyle from '../styles/globalStyle';
 import { Global } from '@emotion/react';
+import {
+  initializeAnalyticsQueue,
+  loadAnalyticsScript,
+  trackPageView,
+} from '../analytics';
+
+Router.events.on('routeChangeComplete', trackPageView);
 
 export default function App({ Component, pageProps }: AppProps): ReactElement {
+  useEffect(() => {
+    initializeAnalyticsQueue();
+    trackPageView(`${window.location.pathname}${window.location.search}`);
+
+    if ('windowLoaded' in window) {
+      loadAnalyticsScript();
+    }
+    window.addEventListener('load', loadAnalyticsScript, {
+      once: true,
+    });
+  }, []);
+
   return (
     <>
       <Head>

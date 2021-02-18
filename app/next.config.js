@@ -8,6 +8,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 module.exports = withPWA({
   pwa: {
     dest: 'public',
+    disable: process.env.NODE_ENV === 'development',
   },
   ...withPreact(
     withBundleAnalyzer({
