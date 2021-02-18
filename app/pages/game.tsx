@@ -38,8 +38,8 @@ const Score = styled.h2`
 const ImageContainer = styled.div`
   position: relative;
   display: flex;
-  width: 30vh;
-  max-width: ${rem(256)};
+  width: 25vh;
+  max-width: ${rem(200)};
   align-self: center;
   overflow: hidden;
   margin-bottom: ${rem(32)};
@@ -54,6 +54,7 @@ const ImageContainer = styled.div`
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border-radius: ${rem(16)};
   }
 
   &:before {
@@ -291,7 +292,6 @@ export default function Game(): ReactElement {
               src={question.logo
                 .replace('/upload/', '/upload/f_auto,q_auto/')
                 .replace('.jpg', '')}
-              key={isLoadingImage.toString()}
               alt="Logo"
               onLoad={() => setIsLoadingImage(false)}
             />
