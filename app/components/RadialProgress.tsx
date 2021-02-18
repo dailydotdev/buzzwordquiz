@@ -30,7 +30,7 @@ const Container = styled.div`
       stroke: var(--radial-progress-completed-step);
       transform: rotate(90deg);
       transform-origin: center;
-      transition: stroke-dashoffset 0.1s ease-out;
+      transition: stroke-dashoffset 0.1s linear;
     }
   }
 `;

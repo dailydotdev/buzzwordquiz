@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/react';
-import { ReactElement, useState } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import rem from '../macros/rem.macro';
 import PrimaryButton from '../components/buttons/PrimaryButton';
@@ -17,6 +17,8 @@ import TertiaryButton from '../components/buttons/TertiaryButton';
 import PageContainer from '../components/PageContainer';
 import TextField from '../components/fields/TextField';
 import BigEmoji from '../components/BigEmoji';
+import useGameSession, { UnansweredQuestion } from '../hooks/useGameSession';
+import useTimer from '../hooks/useTimer';
 
 const Main = styled(PageContainer)`
   padding: ${rem(40)} ${rem(20)};
@@ -116,31 +118,53 @@ const CompletedText = styled.div`
   ${typoFootnote}
 `;
 
-const words = [5];
-const options = ['R', 'E', 'D', 'I', 'S', 'A', 'B', 'C', 'D', 'E'];
-const progress = 80;
-const score = 2;
 const completed = false;
+
+const progressColors: ColorName[] = ['avocado', 'cheese', 'ketchup'];
 
 function updateArrayItem<T>(array: T[], index: number, item: T): T[] {
   return [...array.slice(0, index), item, ...array.slice(index + 1)];
 }
 
 export default function Game(): ReactElement {
-  const [optionsState, setOptionsState] = useState(
-    options.map((option) => ({ selected: false, letter: option })),
-  );
-  const [answerLetters, setAnswerLetters] = useState(
-    words.flatMap((word, index) => {
-      const base: string[] = new Array(word).fill(null);
-      if (index < words.length - 1) {
-        return [...base, 'space'];
-      }
-      return base;
-    }),
+  const [question, setQuestion] = useState<UnansweredQuestion>(null);
+  const [optionsState, setOptionsState] = useState<
+    { selected: boolean; letter: string }[]
+  >(null);
+  const [answerLetters, setAnswerLetters] = useState<string[]>(null);
+
+  const { session, startSession } = useGameSession();
+  const { millisecondsLeft, quantizedProgress } = useTimer(
+    session?.duration * 1000,
+    !session,
+    3,
+    () => {
+      console.log('timeout');
+    },
   );
 
-  const progressColor: ColorName = 'avocado';
+  useEffect(() => {
+    startSession().then(({ session }) => {
+      setQuestion(session.nextQuestion);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (question) {
+      setOptionsState(
+        question.letters.map((option) => ({ selected: false, letter: option })),
+      );
+      setAnswerLetters(
+        question.words.flatMap((word, index) => {
+          const base: string[] = new Array(word).fill(null);
+          if (index < question.words.length - 1) {
+            return [...base, 'space'];
+          }
+          return base;
+        }),
+      );
+    }
+  }, [question]);
 
   const submitAnswer = (): void => {
     console.log('submit!');
@@ -183,12 +207,16 @@ export default function Game(): ReactElement {
     }
   };
 
+  if (!question || !session) {
+    return <></>;
+  }
+
   return (
     <Main>
       {completed ? (
         <>
           <BigEmoji>🎉</BigEmoji>
-          <CompletedScore>Your score: {score}</CompletedScore>
+          <CompletedScore>Your score: {session.score}</CompletedScore>
           <CompletedText>
             Fill in your nickname to enter our hall of fame
           </CompletedText>
@@ -205,16 +233,16 @@ export default function Game(): ReactElement {
       ) : (
         <>
           <Header>
-            <Score>Score: {score}</Score>
+            <Score>Score: {session.score}</Score>
             <RadialProgress
-              steps={90}
-              progress={progress}
+              steps={session.duration * 1000}
+              progress={millisecondsLeft}
               css={css`
                 position: relative;
                 --radial-progress-step: var(--theme-background-secondary);
-                --radial-progress-completed-step: ${colors[progressColor][
-                  '50'
-                ]};
+                --radial-progress-completed-step: ${colors[
+                  progressColors[quantizedProgress]
+                ]['50']};
               `}
             >
               <span
@@ -231,15 +259,15 @@ export default function Game(): ReactElement {
                   ${typoCallout}
                 `}
               >
-                {progress}
+                {(millisecondsLeft / 1000).toFixed()}
               </span>
             </RadialProgress>
           </Header>
           <ImageContainer>
-            <img src="https://daily-now-res.cloudinary.com/image/upload/v1611565802/logos/dd2e9bdf8f9e4d0f8e0a48063f3f36c9.jpg" />
+            <img src={question.logo} alt="Logo" />
           </ImageContainer>
           <Letters>
-            {answerLetters.map((letter, index) =>
+            {answerLetters?.map((letter, index) =>
               !letter ? (
                 <EmptyLetter key={index} />
               ) : letter === 'space' ? (
@@ -256,7 +284,7 @@ export default function Game(): ReactElement {
             )}
           </Letters>
           <Options>
-            {optionsState.map((option, index) => (
+            {optionsState?.map((option, index) => (
               <PrimaryButton
                 key={index}
                 disabled={option.selected}
@@ -271,7 +299,7 @@ export default function Game(): ReactElement {
               margin-top: ${rem(40)};
             `}
           >
-            Skip (0/5)
+            Skip ({session.skips}/{session.maxSkips})
           </TertiaryButton>
         </>
       )}
