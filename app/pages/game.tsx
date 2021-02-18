@@ -287,7 +287,9 @@ export default function Game(): ReactElement {
           </Header>
           <ImageContainer>
             <img
-              src={question.logo}
+              src={question.logo
+                .replace('/upload/', '/upload/f_auto,q_auto/')
+                .replace('.jpg', '')}
               alt="Logo"
               onLoad={() => setIsLoading(false)}
             />

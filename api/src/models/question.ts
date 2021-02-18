@@ -16,11 +16,6 @@ export interface Question {
   logo: string;
 }
 
-interface ContentfulQuestion {
-  answer: string;
-  logo: { original_secure_url: string };
-}
-
 export const getQuestionsCount = async (): Promise<number> => {
   const response = await client.getEntries({
     content_type: 'question',
@@ -34,17 +29,14 @@ export const getNextQuestion = async (
   exclude: string[],
 ): Promise<Question> => {
   const skip = random(total);
-  const response = await client.getEntries<ContentfulQuestion>({
+  const response = await client.getEntries<Question>({
     content_type: 'question',
     limit: 1,
     skip,
     'fields.answer[nin]': exclude.join(','),
   });
 
-  return {
-    answer: response.items[0].fields.answer,
-    logo: response.items[0].fields.logo[0].original_secure_url,
-  };
+  return response.items[0].fields;
 };
 
 export const generateLettersFromAnswer = (answer: string): string[] => {
