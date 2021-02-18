@@ -10,7 +10,7 @@ declare module 'ioredis' {
 export const redisOptions: RedisOptions = {
   host: process.env.REDIS_HOST,
   port: parseInt(process.env.REDIS_PORT, 10),
-  password: process.env.REDIS_PASS,
+  password: process.env.REDIS_AUTH,
 };
 
 export const redis = new Redis(redisOptions);
