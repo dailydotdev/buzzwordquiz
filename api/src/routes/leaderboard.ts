@@ -3,7 +3,7 @@ import { redis } from '../redis';
 import { LEADERBOARD_SIZE } from './sessions';
 
 type LeaderboardRow = {
-  sessionId: string;
+  id: string;
   name: string;
   date: string;
   score: number;

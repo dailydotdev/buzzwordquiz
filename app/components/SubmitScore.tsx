@@ -2,6 +2,7 @@
 import { css, jsx } from '@emotion/react';
 import { ReactElement, useEffect, useState } from 'react';
 import Confetti from 'react-dom-confetti';
+import requestIdleCallback from 'next/dist/client/request-idle-callback';
 import BigEmoji from './BigEmoji';
 import TextField from './fields/TextField';
 import PrimaryButton from './buttons/PrimaryButton';
@@ -50,7 +51,7 @@ export default function SubmitScore({
   const [valid, setValid] = useState(false);
 
   useEffect(() => {
-    setShowConfetti(true);
+    requestIdleCallback(() => setShowConfetti(true));
   }, []);
 
   const onClick = () => {

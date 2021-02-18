@@ -1,7 +1,8 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/react';
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import styled from '@emotion/styled';
+import useSWR from 'swr';
 import {
   typoBody,
   typoHeadline,
@@ -15,6 +16,7 @@ import PrimaryButton from '../components/buttons/PrimaryButton';
 import BigEmoji from '../components/BigEmoji';
 import Link from 'next/link';
 import SecondaryButton from '../components/buttons/SecondaryButton';
+import { useRouter } from 'next/router';
 
 const Main = styled(PageContainer)`
   padding: ${rem(20)};
@@ -68,15 +70,6 @@ const MyScore = styled.div`
   ${typoHeadline}
 `;
 
-const myScore = { rank: 1, name: 'Nimrod', score: 20 };
-
-const leaderboard = [
-  { name: 'Ido', score: 12 },
-  { name: 'Tom', score: 8 },
-  { name: 'Jack', score: 5 },
-  { name: 'Gal', score: 4 },
-];
-
 const rankRepresentation = (rank: number) => {
   if (rank === 1) {
     return '🥇';
@@ -91,12 +84,74 @@ const rankRepresentation = (rank: number) => {
   return `#${rank}`;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const fetcher = (input: RequestInfo, init?: RequestInit): Promise<any> =>
+  fetch(input, init).then((res) => res.json());
+
 const getTwitterShareLink = (link: string, text: string): string =>
   `http://twitter.com/share?url=${encodeURIComponent(
     link,
   )}&text=${encodeURIComponent(`${text} by @dailydotdev`)}`;
 
+type LeaderboardRow = {
+  id: string;
+  name: string;
+  date: string;
+  score: number;
+};
+
 export default function Index(): ReactElement {
+  const router = useRouter();
+
+  const [currentSession, setCurrentSession] = useState<{
+    sessionId: string;
+    name: string;
+    score: number;
+  }>(null);
+  const [myScore, setMyScore] = useState<{
+    rank: number;
+    name: string;
+    score: number;
+  }>(null);
+  const { data } = useSWR<{ leaderboard: LeaderboardRow[] }>(
+    '/api/leaderboard',
+    fetcher,
+  );
+
+  useEffect(() => {
+    if (router.query.sessionId) {
+      setCurrentSession({
+        sessionId: router.query.sessionId.toString(),
+        name: router.query.name.toString(),
+        score: parseInt(router.query.score.toString()),
+      });
+      router.replace('/leaderboard', undefined, { shallow: true });
+    }
+  }, [router.query]);
+
+  useEffect(() => {
+    if (currentSession) {
+      if (data?.leaderboard) {
+        const myRank = data.leaderboard.findIndex(
+          (leader) => leader.id === currentSession.sessionId,
+        );
+        if (myRank > -1) {
+          setMyScore({
+            score: data.leaderboard[myRank].score,
+            name: data.leaderboard[myRank].name,
+            rank: myRank + 1,
+          });
+          return;
+        }
+      }
+      setMyScore({
+        rank: 0,
+        name: currentSession.name,
+        score: currentSession.score,
+      });
+    }
+  }, [data, currentSession]);
+
   const share = async () => {
     const text = `I nailed ${myScore.score} logos on buzzword quiz. Let's see if you can beat me! 💩`;
     const url = 'https://buzzwordquiz.vercel.app/';
@@ -126,44 +181,54 @@ export default function Index(): ReactElement {
           </SecondaryButton>
         </Link>
       </Header>
-      <>
-        <MyScoreTitle>Your rank</MyScoreTitle>
-        <MyScore>
-          <div>{rankRepresentation(myScore.rank)}</div>
-          <div>{myScore.name}</div>
-          <div
+      {data?.leaderboard && (
+        <>
+          {myScore && (
+            <>
+              <MyScoreTitle>Your rank</MyScoreTitle>
+              <MyScore>
+                <div>
+                  {myScore.rank > 0 ? rankRepresentation(myScore.rank) : 'N/A'}
+                </div>
+                <div>{myScore.name}</div>
+                <div
+                  css={css`
+                    margin-left: auto;
+                  `}
+                >
+                  {myScore.score}
+                </div>
+              </MyScore>
+              <PrimaryButton onClick={share}>
+                Challenge a friend 💩
+              </PrimaryButton>
+            </>
+          )}
+          <BigEmoji
             css={css`
-              margin-left: auto;
+              margin-top: ${rem(40)};
             `}
           >
-            {myScore.score}
-          </div>
-        </MyScore>
-        <PrimaryButton onClick={share}>Challenge a friend 💩</PrimaryButton>
-      </>
-      <BigEmoji
-        css={css`
-          margin-top: ${rem(40)};
-        `}
-      >
-        🏆
-      </BigEmoji>
-      <Title>Hall of Fame</Title>
-      <List>
-        {leaderboard.map((record, index) => (
-          <ListItem value={record.score} key={index}>
-            <div>{rankRepresentation(index + 1)}</div>
-            <div>{record.name}</div>
-            <div
-              css={css`
-                margin-left: auto;
-              `}
-            >
-              {record.score}
-            </div>
-          </ListItem>
-        ))}
-      </List>
+            🏆
+          </BigEmoji>
+          <Title>Hall of Fame</Title>
+          <List>
+            {data?.leaderboard.map((record, index) => (
+              <ListItem value={record.score} key={index}>
+                <div>{rankRepresentation(index + 1)}</div>
+                <div>{record.name}</div>
+                <div
+                  css={css`
+                    margin-left: auto;
+                  `}
+                >
+                  {record.score}
+                </div>
+              </ListItem>
+            ))}
+          </List>
+        </>
+      )}
     </Main>
   );
 }

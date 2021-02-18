@@ -123,7 +123,7 @@ export default function Game(): ReactElement {
 
   const [playSuccess] = useSound('/success.mp3');
   const [playFail] = useSound('/fail.mp3');
-  const [playTyping] = useSound('/typing.mp3');
+  const [playTap] = useSound('/tap.mp3');
 
   const [playClock, { stop: stopClock }] = useSound('/clock.mp3', {
     loop: true,
@@ -193,7 +193,7 @@ export default function Game(): ReactElement {
   const onOptionClick = (index: number): void => {
     const availableSpot = answerLetters.findIndex((letter) => !letter);
     if (availableSpot > -1) {
-      playTyping();
+      playTap();
       const newAnswerLetters = updateArrayItem(
         answerLetters,
         availableSpot,
