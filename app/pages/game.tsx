@@ -206,7 +206,8 @@ export default function Game(): ReactElement {
           selected: true,
         }),
       );
-      if (availableSpot === answerLetters.length - 1) {
+      const nextSpot = newAnswerLetters.findIndex((letter) => !letter);
+      if (nextSpot < 0) {
         submitAnswer(
           newAnswerLetters
             .map((letter) => (letter === 'space' ? ' ' : letter))
