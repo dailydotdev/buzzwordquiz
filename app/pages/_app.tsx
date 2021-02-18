@@ -1,10 +1,12 @@
+import { use100vh } from 'react-div-100vh';
+
 if (process.env.NODE_ENV === 'development') {
   // Must use require here as import statements are only allowed
   // to exist at top-level.
   require('preact/debug');
 }
 
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 import { AppProps } from 'next/app';
 import Head from 'next/head';
 import 'focus-visible';
@@ -14,6 +16,14 @@ import globalStyle from '../styles/globalStyle';
 import { Global } from '@emotion/react';
 
 export default function App({ Component, pageProps }: AppProps): ReactElement {
+  const height = use100vh();
+
+  useEffect(() => {
+    (document.querySelector(
+      '#__next',
+    ) as HTMLDivElement).style.height = `${height}px`;
+  }, [height]);
+
   return (
     <>
       <Head>
@@ -58,7 +68,7 @@ export default function App({ Component, pageProps }: AppProps): ReactElement {
       </Head>
       <DefaultSeo {...Seo} />
       <Global styles={globalStyle} />
-      <Component {...pageProps} />
+      {height && <Component {...pageProps} />}
     </>
   );
 }

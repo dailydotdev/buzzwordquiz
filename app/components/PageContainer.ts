@@ -6,7 +6,6 @@ const PageContainer = styled.main`
   width: 100%;
   max-width: ${rem(375)};
   height: 100%;
-  height: -webkit-fill-available;
   max-height: ${rem(815)};
   margin: auto;
   flex-direction: column;

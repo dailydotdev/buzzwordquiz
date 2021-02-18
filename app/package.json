@@ -21,6 +21,7 @@
     "preact": "^10.5.12",
     "preact-render-to-string": "^5.1.12",
     "react": "npm:@preact/compat@0.0.4",
+    "react-div-100vh": "^0.5.6",
     "react-dom": "npm:@preact/compat@0.0.4",
     "react-dom-confetti": "^0.2.0",
     "react-ssr-prepass": "npm:preact-ssr-prepass@^1.1.3",

@@ -104,18 +104,12 @@ export default css`
     align-items: stretch;
   }
 
+  html,
   body {
-    height: 100vh;
-    /* mobile viewport bug fix */
-    height: -webkit-fill-available;
-  }
-
-  html {
-    height: -webkit-fill-available;
+    height: 100%;
   }
 
   #__next {
     height: 100%;
-    height: -webkit-fill-available;
   }
 `;
