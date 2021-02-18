@@ -18,9 +18,38 @@ export default function App({ Component, pageProps }: AppProps): ReactElement {
     <>
       <Head>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-        <meta name="theme-color" content="#151618" />
-        <meta name="msapplication-navbutton-color" content="#151618" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="#151618" />
+        <meta name="theme-color" content="#0E1217" />
+        <meta name="msapplication-navbutton-color" content="#0E1217" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="#0E1217" />
+
+        <meta name="application-name" content="Buzzword Quiz" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Buzzword Quiz" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="msapplication-TileColor" content="#0E1217" />
+        <meta name="msapplication-tap-highlight" content="no" />
+
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/apple-touch-icon.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/favicon-32x32.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/favicon-16x16.png"
+        />
+        <link rel="manifest" href="/manifest.json" />
+
         <script
           dangerouslySetInnerHTML={{
             __html: `window.addEventListener('load', () => { window.windowLoaded = true; }, {
