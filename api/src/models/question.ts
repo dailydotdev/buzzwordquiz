@@ -16,12 +16,18 @@ export interface Question {
   logo: string;
 }
 
-export const getQuestionsCount = async (): Promise<number> => {
-  const response = await client.getEntries({
+let cache: Question[];
+
+export const refreshLocalQuestionsCache = async (): Promise<void> => {
+  const response = await client.getEntries<Question>({
     content_type: 'question',
-    limit: 1,
+    limit: 1000,
   });
-  return response.total;
+  cache = response.items.map((item) => item.fields);
+};
+
+export const getQuestionsCount = async (): Promise<number> => {
+  return cache.length;
 };
 
 export const getNextQuestion = async (
@@ -29,14 +35,8 @@ export const getNextQuestion = async (
   exclude: string[],
 ): Promise<Question> => {
   const skip = random(total);
-  const response = await client.getEntries<Question>({
-    content_type: 'question',
-    limit: 1,
-    skip,
-    'fields.answer[nin]': exclude.join(','),
-  });
-
-  return response.items[0].fields;
+  const filtered = cache.filter((item) => exclude.indexOf(item.answer) < 0);
+  return filtered[skip];
 };
 
 export const generateLettersFromAnswer = (answer: string): string[] => {
