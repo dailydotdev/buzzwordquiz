@@ -2,6 +2,7 @@
 types
 build/
 app.yaml
+logos/
 
 ### Node template
 # Logs

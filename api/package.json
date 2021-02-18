@@ -13,6 +13,7 @@
     "compile-schemas": "json2ts -i schemas -o types"
   },
   "dependencies": {
+    "cloudinary": "^1.24.0",
     "contentful": "^8.1.7",
     "dotenv": "^8.2.0",
     "fast-json-stringify": "^2.4.1",
@@ -30,6 +31,7 @@
     "@types/supertest": "^2.0.10",
     "@typescript-eslint/eslint-plugin": "^4.15.0",
     "@typescript-eslint/parser": "^4.15.0",
+    "contentful-management": "^7.8.0",
     "eslint": "^7.20.0",
     "eslint-config-prettier": "^7.2.0",
     "eslint-plugin-prettier": "^3.3.1",
