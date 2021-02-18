@@ -116,7 +116,8 @@ export default function Game(): ReactElement {
     { selected: boolean; letter: string }[]
   >(null);
   const [answerLetters, setAnswerLetters] = useState<string[]>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingImage, setIsLoadingImage] = useState(true);
   const [completed, setCompleted] = useState(false);
 
   const [playSuccess] = useSound('/success.mp3');
@@ -137,7 +138,7 @@ export default function Game(): ReactElement {
   } = useGameSession();
   const { millisecondsLeft, quantizedProgress, lastTenSeconds } = useTimer(
     session?.duration * 1000,
-    isLoading,
+    isLoading || isLoadingImage,
     3,
     () => {
       stopClock();
@@ -176,15 +177,15 @@ export default function Game(): ReactElement {
 
   const submitAnswer = async (answer: string): Promise<void> => {
     setIsLoading(true);
-    (document.activeElement as HTMLButtonElement)?.blur?.();
     const res = await sendAnswer(answer);
+    setIsLoading(false);
     if (res.correct) {
+      setIsLoadingImage(true);
       playSuccess();
       setQuestion(res.session.nextQuestion);
       navigator.vibrate?.(250);
     } else {
       playFail();
-      setIsLoading(false);
       navigator.vibrate?.([250, 250, 250]);
     }
   };
@@ -231,7 +232,7 @@ export default function Game(): ReactElement {
   };
 
   const skip = async () => {
-    setIsLoading(true);
+    setIsLoadingImage(true);
     const res = await skipQuestion();
     setQuestion(res.session.nextQuestion);
   };
@@ -289,47 +290,52 @@ export default function Game(): ReactElement {
               src={question.logo
                 .replace('/upload/', '/upload/f_auto,q_auto/')
                 .replace('.jpg', '')}
+              key={isLoadingImage.toString()}
               alt="Logo"
-              onLoad={() => setIsLoading(false)}
+              onLoad={() => setIsLoadingImage(false)}
             />
           </ImageContainer>
-          <Letters>
-            {answerLetters?.map((letter, index) =>
-              !letter ? (
-                <EmptyLetter key={index} />
-              ) : letter === 'space' ? (
-                <WrapBreak key={index} />
-              ) : (
-                <SecondaryButton
-                  buttonSize="small"
-                  key={index}
-                  onClick={() => onAnswerClick(index)}
-                >
-                  {letter}
-                </SecondaryButton>
-              ),
-            )}
-          </Letters>
-          <Options>
-            {optionsState?.map((option, index) => (
-              <PrimaryButton
-                key={index}
-                disabled={option.selected}
-                onClick={() => onOptionClick(index)}
+          {!isLoadingImage && (
+            <>
+              <Letters>
+                {answerLetters?.map((letter, index) =>
+                  !letter ? (
+                    <EmptyLetter key={index} />
+                  ) : letter === 'space' ? (
+                    <WrapBreak key={index} />
+                  ) : (
+                    <SecondaryButton
+                      buttonSize="small"
+                      key={letter + index}
+                      onClick={() => onAnswerClick(index)}
+                    >
+                      {letter}
+                    </SecondaryButton>
+                  ),
+                )}
+              </Letters>
+              <Options>
+                {optionsState?.map((option, index) => (
+                  <PrimaryButton
+                    key={option.letter + index}
+                    disabled={option.selected}
+                    onClick={() => onOptionClick(index)}
+                  >
+                    {option.letter}
+                  </PrimaryButton>
+                ))}
+              </Options>
+              <TertiaryButton
+                css={css`
+                  margin-top: ${rem(40)};
+                `}
+                onClick={skip}
+                disabled={session.skips >= session.maxSkips}
               >
-                {option.letter}
-              </PrimaryButton>
-            ))}
-          </Options>
-          <TertiaryButton
-            css={css`
-              margin-top: ${rem(40)};
-            `}
-            onClick={skip}
-            disabled={session.skips >= session.maxSkips}
-          >
-            Skip ({session.skips}/{session.maxSkips})
-          </TertiaryButton>
+                Skip ({session.skips}/{session.maxSkips})
+              </TertiaryButton>
+            </>
+          )}
         </>
       )}
     </Main>
