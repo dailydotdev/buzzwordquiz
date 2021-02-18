@@ -38,14 +38,10 @@ const Score = styled.h2`
 const ImageContainer = styled.div`
   position: relative;
   display: flex;
-  width: 25vh;
-  max-width: ${rem(200)};
+  width: 22vh;
+  max-width: ${rem(180)};
   align-self: center;
-  overflow: hidden;
   margin-bottom: ${rem(32)};
-  border-radius: ${rem(16)};
-  background: var(--theme-label-primary);
-  box-shadow: var(--theme-shadow2);
 
   img {
     position: absolute;
@@ -55,6 +51,7 @@ const ImageContainer = styled.div`
     height: 100%;
     object-fit: cover;
     border-radius: ${rem(16)};
+    box-shadow: var(--theme-shadow2);
   }
 
   &:before {
