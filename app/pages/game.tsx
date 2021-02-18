@@ -4,25 +4,23 @@ import { ReactElement, useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import rem from '../macros/rem.macro';
 import PrimaryButton from '../components/buttons/PrimaryButton';
-import {
-  typoCallout,
-  typoFootnote,
-  typoMega3,
-  typoTitle3,
-} from '../styles/typography';
+import { typoCallout, typoFootnote, typoTitle3 } from '../styles/typography';
 import SecondaryButton from '../components/buttons/SecondaryButton';
 import RadialProgress from '../components/RadialProgress';
 import colors, { ColorName } from '../styles/colors';
 import TertiaryButton from '../components/buttons/TertiaryButton';
 import PageContainer from '../components/PageContainer';
-import TextField from '../components/fields/TextField';
-import BigEmoji from '../components/BigEmoji';
 import useGameSession, { UnansweredQuestion } from '../hooks/useGameSession';
 import useTimer from '../hooks/useTimer';
 import useSound from 'use-sound';
+import { useRouter } from 'next/router';
+import dynamic from 'next/dynamic';
+
+const SubmitScore = dynamic(() => import('../components/SubmitScore'));
 
 const Main = styled(PageContainer)`
   padding: ${rem(40)} ${rem(20)};
+  overflow: hidden;
 `;
 
 const Header = styled.header`
@@ -107,18 +105,6 @@ const Options = styled(Letters)`
   }
 `;
 
-const CompletedScore = styled.h2`
-  margin: ${rem(16)} 0 ${rem(48)};
-  text-align: center;
-  ${typoMega3}
-`;
-
-const CompletedText = styled.div`
-  margin: ${rem(32)} ${rem(12)} ${rem(8)};
-  color: var(--theme-label-quaternary);
-  ${typoFootnote}
-`;
-
 const progressColors: ColorName[] = ['avocado', 'cheese', 'ketchup'];
 
 function updateArrayItem<T>(array: T[], index: number, item: T): T[] {
@@ -126,6 +112,7 @@ function updateArrayItem<T>(array: T[], index: number, item: T): T[] {
 }
 
 export default function Game(): ReactElement {
+  const router = useRouter();
   const [question, setQuestion] = useState<UnansweredQuestion>(null);
   const [optionsState, setOptionsState] = useState<
     { selected: boolean; letter: string }[]
@@ -136,13 +123,20 @@ export default function Game(): ReactElement {
 
   const [playSuccess] = useSound('/success.mp3');
   const [playFail] = useSound('/fail.mp3');
+  const [playTyping] = useSound('/typing.mp3');
 
   const [playClock, { stop: stopClock }] = useSound('/clock.mp3', {
     loop: true,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any);
 
-  const { session, startSession, sendAnswer, skipQuestion } = useGameSession();
+  const {
+    session,
+    startSession,
+    sendAnswer,
+    skipQuestion,
+    completeSession,
+  } = useGameSession();
   const { millisecondsLeft, quantizedProgress, lastTenSeconds } = useTimer(
     session?.duration * 1000,
     isLoading,
@@ -199,6 +193,7 @@ export default function Game(): ReactElement {
   const onOptionClick = (index: number): void => {
     const availableSpot = answerLetters.findIndex((letter) => !letter);
     if (availableSpot > -1) {
+      playTyping();
       const newAnswerLetters = updateArrayItem(
         answerLetters,
         availableSpot,
@@ -242,6 +237,13 @@ export default function Game(): ReactElement {
     setQuestion(res.session.nextQuestion);
   };
 
+  const submitScore = async (name: string) => {
+    const res = await completeSession(name);
+    await router.push(
+      `/leaderboard?sessionId=${res.sessionId}&score=${res.score}&name=${name}`,
+    );
+  };
+
   if (!question || !session) {
     return <></>;
   }
@@ -249,22 +251,7 @@ export default function Game(): ReactElement {
   return (
     <Main>
       {completed ? (
-        <>
-          <BigEmoji>🎉</BigEmoji>
-          <CompletedScore>Your score: {session.score}</CompletedScore>
-          <CompletedText>
-            Fill in your nickname to enter our hall of fame
-          </CompletedText>
-          <TextField inputId="nickname" label="Nickname" />
-          <PrimaryButton
-            css={css`
-              margin-top: ${rem(32)};
-              align-self: center;
-            `}
-          >
-            For fame and glory 🎖
-          </PrimaryButton>
-        </>
+        <SubmitScore score={session.score} submitScore={submitScore} />
       ) : (
         <>
           <Header>

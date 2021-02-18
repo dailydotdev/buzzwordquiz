@@ -24,6 +24,9 @@ type UseGameSessionReturn = {
     answer: string,
   ) => Promise<{ correct: boolean; session?: Session }>;
   skipQuestion: () => Promise<{ session: Session }>;
+  completeSession: (
+    name: string,
+  ) => Promise<{ sessionId: string; score: number }>;
 };
 
 export default function useGameSession(): UseGameSessionReturn {
@@ -70,6 +73,17 @@ export default function useGameSession(): UseGameSessionReturn {
         setSession(body.session);
       }
       return body;
+    },
+    completeSession: async (name) => {
+      const res = await fetch('/api/sessions/complete', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name }),
+      });
+      return res.json();
     },
   };
 }
