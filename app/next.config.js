@@ -6,6 +6,9 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 });
 
 module.exports = withPWA({
+  pwa: {
+    dest: 'public',
+  },
   ...withPreact(
     withBundleAnalyzer({
       webpack: (config) => {
