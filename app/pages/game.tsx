@@ -137,9 +137,11 @@ export default function Game(): ReactElement {
 
   const [playSuccess] = useSound('/success.mp3');
   const [playFail] = useSound('/fail.mp3');
+
   const [playClock, { stop: stopClock }] = useSound('/clock.mp3', {
     loop: true,
-  });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } as any);
 
   const { session, startSession, sendAnswer, skipQuestion } = useGameSession();
   const { millisecondsLeft, quantizedProgress, lastTenSeconds } = useTimer(
