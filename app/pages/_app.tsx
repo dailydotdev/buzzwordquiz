@@ -6,7 +6,7 @@ if (process.env.NODE_ENV === 'development') {
   require('preact/debug');
 }
 
-import React, { ReactElement, useEffect } from 'react';
+import React, { ReactElement } from 'react';
 import { AppProps } from 'next/app';
 import Head from 'next/head';
 import 'focus-visible';
@@ -14,27 +14,11 @@ import { DefaultSeo } from 'next-seo';
 import Seo from '../next-seo';
 import globalStyle from '../styles/globalStyle';
 import { Global } from '@emotion/react';
-import {
-  initializeAnalyticsQueue,
-  loadAnalyticsScript,
-  trackPageView,
-} from '../analytics';
+import { trackPageView } from '../analytics';
 
 Router.events.on('routeChangeComplete', trackPageView);
 
 export default function App({ Component, pageProps }: AppProps): ReactElement {
-  useEffect(() => {
-    initializeAnalyticsQueue();
-    trackPageView(`${window.location.pathname}${window.location.search}`);
-
-    if ('windowLoaded' in window) {
-      loadAnalyticsScript();
-    }
-    window.addEventListener('load', loadAnalyticsScript, {
-      once: true,
-    });
-  }, []);
-
   return (
     <>
       <Head>
@@ -72,10 +56,20 @@ export default function App({ Component, pageProps }: AppProps): ReactElement {
         <link rel="manifest" href="/manifest.json" />
 
         <script
+          async
+          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA}`}
+        />
+        <script
           dangerouslySetInnerHTML={{
-            __html: `window.addEventListener('load', () => { window.windowLoaded = true; }, {
-      once: true,
-    });`,
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${process.env.NEXT_PUBLIC_GA}', {
+                client_storage: 'none',
+                page_path: window.location.pathname,
+              });
+          `,
           }}
         />
       </Head>
