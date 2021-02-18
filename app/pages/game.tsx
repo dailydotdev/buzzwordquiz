@@ -119,8 +119,6 @@ const CompletedText = styled.div`
   ${typoFootnote}
 `;
 
-const completed = false;
-
 const progressColors: ColorName[] = ['avocado', 'cheese', 'ketchup'];
 
 function updateArrayItem<T>(array: T[], index: number, item: T): T[] {
@@ -134,6 +132,7 @@ export default function Game(): ReactElement {
   >(null);
   const [answerLetters, setAnswerLetters] = useState<string[]>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [completed, setCompleted] = useState(false);
 
   const [playSuccess] = useSound('/success.mp3');
   const [playFail] = useSound('/fail.mp3');
@@ -150,7 +149,7 @@ export default function Game(): ReactElement {
     3,
     () => {
       stopClock();
-      console.log('timeout');
+      setCompleted(true);
     },
   );
 
@@ -189,9 +188,11 @@ export default function Game(): ReactElement {
     if (res.correct) {
       playSuccess();
       setQuestion(res.session.nextQuestion);
+      navigator.vibrate?.(250);
     } else {
       playFail();
       setIsLoading(false);
+      navigator.vibrate?.([250, 250, 250]);
     }
   };
 
