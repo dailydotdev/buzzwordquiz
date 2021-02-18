@@ -176,6 +176,7 @@ export default function Game(): ReactElement {
 
   const submitAnswer = async (answer: string): Promise<void> => {
     setIsLoading(true);
+    (document.activeElement as HTMLButtonElement)?.blur?.();
     const res = await sendAnswer(answer);
     if (res.correct) {
       playSuccess();
