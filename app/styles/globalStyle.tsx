@@ -116,5 +116,6 @@ export default css`
 
   #__next {
     height: 100%;
+    height: -webkit-fill-available;
   }
 `;
