@@ -9,6 +9,7 @@ import PrimaryButton from './buttons/PrimaryButton';
 import rem from '../macros/rem.macro';
 import styled from '@emotion/styled';
 import { typoFootnote, typoMega3 } from '../styles/typography';
+import Credit from './Credit';
 
 const confettiConfig = {
   angle: 90,
@@ -84,6 +85,15 @@ export default function SubmitScore({
         For fame and glory 🎖
       </PrimaryButton>
       <Confetti active={showConfetti} config={confettiConfig} />
+      <Credit
+        href="https://app.daily.dev/?ref=buzzwordquiz"
+        css={css`
+          margin-top: auto;
+          margin-bottom: ${rem(16)};
+        `}
+      >
+        Made with ❤️ by daily.dev
+      </Credit>
     </>
   );
 }

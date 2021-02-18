@@ -1,11 +1,14 @@
-import React, { ReactElement } from 'react';
+/** @jsx jsx */
+import { jsx, css } from '@emotion/react';
+import { ReactElement } from 'react';
 import Link from 'next/link';
 import styled from '@emotion/styled';
-import { typoCallout, typoFootnote } from '../styles/typography';
+import { typoCallout } from '../styles/typography';
 import rem from '../macros/rem.macro';
 import PrimaryButton from '../components/buttons/PrimaryButton';
 import SecondaryButton from '../components/buttons/SecondaryButton';
 import PageContainer from '../components/PageContainer';
+import Credit from '../components/Credit';
 
 const ImageContainer = styled.div`
   position: relative;
@@ -60,14 +63,6 @@ const Subtitle = styled.h2`
   ${typoCallout}
 `;
 
-const Credit = styled.a`
-  margin-bottom: ${rem(16)};
-  align-self: center;
-  color: var(--theme-label-tertiary);
-  text-decoration: underline;
-  ${typoFootnote}
-`;
-
 export default function Index(): ReactElement {
   return (
     <Main>
@@ -97,7 +92,12 @@ export default function Index(): ReactElement {
           Leaderboard please... 🍿
         </SecondaryButton>
       </Link>
-      <Credit href="https://app.daily.dev/?ref=buzzwordquiz">
+      <Credit
+        href="https://app.daily.dev/?ref=buzzwordquiz"
+        css={css`
+          margin-bottom: ${rem(16)};
+        `}
+      >
         Made with ❤️ by daily.dev
       </Credit>
     </Main>
