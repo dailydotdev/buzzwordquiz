@@ -154,7 +154,7 @@ export default function Index(): ReactElement {
 
   const share = async () => {
     const text = `I nailed ${myScore.score} logos on buzzword quiz. Let's see if you can beat me! 💩`;
-    const url = 'https://buzzwordquiz.vercel.app/';
+    const url = 'https://buzzwordquiz.dev/';
     if ('share' in navigator) {
       await navigator.share({
         text,
