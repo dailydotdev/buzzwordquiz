@@ -1,5 +1,7 @@
 .env
 build/
+public/sw.js
+public/workbox-*.js
 
 ### Node template
 # Logs
