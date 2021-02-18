@@ -19,7 +19,7 @@ import dynamic from 'next/dynamic';
 const SubmitScore = dynamic(() => import('../components/SubmitScore'));
 
 const Main = styled(PageContainer)`
-  padding: ${rem(40)} ${rem(20)};
+  padding: ${rem(24)} ${rem(20)} ${rem(40)};
   overflow: hidden;
 `;
 
