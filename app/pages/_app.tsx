@@ -1,5 +1,3 @@
-import { Router } from 'next/router';
-
 if (process.env.NODE_ENV === 'development') {
   // Must use require here as import statements are only allowed
   // to exist at top-level.
@@ -14,9 +12,6 @@ import { DefaultSeo } from 'next-seo';
 import Seo from '../next-seo';
 import globalStyle from '../styles/globalStyle';
 import { Global } from '@emotion/react';
-import { trackPageView } from '../analytics';
-
-Router.events.on('routeChangeComplete', trackPageView);
 
 export default function App({ Component, pageProps }: AppProps): ReactElement {
   return (
@@ -56,21 +51,9 @@ export default function App({ Component, pageProps }: AppProps): ReactElement {
         <link rel="manifest" href="/manifest.json" />
 
         <script
-          async
-          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA}`}
-        />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', '${process.env.NEXT_PUBLIC_GA}', {
-                client_storage: 'none',
-                page_path: window.location.pathname,
-              });
-          `,
-          }}
+          defer
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon='{"token": "49f88fe44f854e3bacf246f0c4d02344", "spa": true}'
         />
       </Head>
       <DefaultSeo {...Seo} />
