@@ -20,6 +20,9 @@ type UseGameSessionReturn = {
   token: string;
   session: Session;
   startSession: () => Promise<{ token: string; session: Session }>;
+  sendAnswer: (
+    answer: string,
+  ) => Promise<{ correct: boolean; session?: Session }>;
 };
 
 export default function useGameSession(): UseGameSessionReturn {
@@ -34,6 +37,24 @@ export default function useGameSession(): UseGameSessionReturn {
       const body = (await res.json()) as { token: string; session: Session };
       setToken(body.token);
       setSession(body.session);
+      return body;
+    },
+    sendAnswer: async (answer) => {
+      const res = await fetch('/api/sessions/answer', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ answer }),
+      });
+      const body = (await res.json()) as {
+        correct: boolean;
+        session?: Session;
+      };
+      if (body.session) {
+        setSession(body.session);
+      }
       return body;
     },
   };

@@ -33,7 +33,7 @@ export const getNextQuestion = async (
   total: number,
   exclude: string[],
 ): Promise<Question> => {
-  const skip = random(total) - exclude.length;
+  const skip = random(total);
   const response = await client.getEntries<ContentfulQuestion>({
     content_type: 'question',
     limit: 1,

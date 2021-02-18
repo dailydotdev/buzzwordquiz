@@ -132,11 +132,12 @@ export default function Game(): ReactElement {
     { selected: boolean; letter: string }[]
   >(null);
   const [answerLetters, setAnswerLetters] = useState<string[]>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const { session, startSession } = useGameSession();
+  const { session, startSession, sendAnswer } = useGameSession();
   const { millisecondsLeft, quantizedProgress } = useTimer(
     session?.duration * 1000,
-    !session,
+    isLoading,
     3,
     () => {
       console.log('timeout');
@@ -166,20 +167,25 @@ export default function Game(): ReactElement {
     }
   }, [question]);
 
-  const submitAnswer = (): void => {
-    console.log('submit!');
+  const submitAnswer = async (answer: string): Promise<void> => {
+    setIsLoading(true);
+    const res = await sendAnswer(answer);
+    if (res.correct) {
+      setQuestion(res.session.nextQuestion);
+    } else {
+      setIsLoading(false);
+    }
   };
 
   const onOptionClick = (index: number): void => {
     const availableSpot = answerLetters.findIndex((letter) => !letter);
     if (availableSpot > -1) {
-      setAnswerLetters(
-        updateArrayItem(
-          answerLetters,
-          availableSpot,
-          optionsState[index].letter,
-        ),
+      const newAnswerLetters = updateArrayItem(
+        answerLetters,
+        availableSpot,
+        optionsState[index].letter,
       );
+      setAnswerLetters(newAnswerLetters);
       setOptionsState(
         updateArrayItem(optionsState, index, {
           ...optionsState[index],
@@ -187,7 +193,11 @@ export default function Game(): ReactElement {
         }),
       );
       if (availableSpot === answerLetters.length - 1) {
-        submitAnswer();
+        submitAnswer(
+          newAnswerLetters
+            .map((letter) => (letter === 'space' ? ' ' : letter))
+            .join(''),
+        );
       }
     }
   };
@@ -264,7 +274,11 @@ export default function Game(): ReactElement {
             </RadialProgress>
           </Header>
           <ImageContainer>
-            <img src={question.logo} alt="Logo" />
+            <img
+              src={question.logo}
+              alt="Logo"
+              onLoad={() => setIsLoading(false)}
+            />
           </ImageContainer>
           <Letters>
             {answerLetters?.map((letter, index) =>
